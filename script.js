@@ -1,48 +1,44 @@
 const products = [
-    { id: 1, name: "حذاء كلاسيك ذهبي", price: "45,000", desc: "جلد طبيعي فاخر مناسب للمناسبات الرسمية", img: "shoes1.jpg" },
-    { id: 2, name: "حقيبة يد ملكية", price: "65,000", desc: "تصميم عصري مع مساحة داخلية واسعة", img: "bag1.jpg" },
+    { id: 1, name: "حذاء كلاسيك ذهبي", price: "45,000", desc: "جلد طبيعي فاخر بنقشة ملوكية.", img: "URL_IMAGE_HERE" },
+    { id: 2, name: "حقيبة يد ملكية", price: "65,000", desc: "حقيبة سهرة مع قفل ذهبي مميز.", img: "URL_IMAGE_HERE" }
 ];
 
-const productGrid = document.getElementById('product-list');
+let selectedProduct = null;
 
 function displayProducts() {
-    productGrid.innerHTML = products.map(p => `
-        <div class="product-card" onclick="openProduct(${p.id})">
-            <img src="${p.img}" alt="${p.name}">
-            <h3>${p.name}</h3>
-            <p class="price-tag">${p.price} د.ع</p>
-            <p>اضغط للتفاصيل</p>
+    const grid = document.getElementById('product-list');
+    grid.innerHTML = products.map(p => `
+        <div class="product-card">
+            <div>
+                <h3 style="color:var(--gold)">${p.name}</h3>
+                <p class="price-tag">${p.price} د.ع</p>
+            </div>
+            <button class="btn-detail" onclick="showDetails(${p.id})">التفاصيل</button>
         </div>
     `).join('');
 }
 
-// نافذة تفاصيل المنتج
-function openProduct(id) {
-    const p = products.find(item => item.id === id);
-    const modalHtml = `
-        <div id="productModal" class="modal" style="display:flex">
-            <div class="modal-content">
-                <span onclick="closeModal()" style="cursor:pointer; float:left">✖</span>
-                <img src="${p.img}">
-                <h2>${p.name}</h2>
-                <p>${p.desc}</p>
-                <p class="price-tag">${p.price} د.ع</p>
-                <button class="btn-order" onclick="sendToWhatsApp('${p.name}')">طلب عبر واتساب</button>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
+function showDetails(id) {
+    selectedProduct = products.find(p => p.id === id);
+    alert(`تفاصيل المنتج: ${selectedProduct.name}\n\n${selectedProduct.desc}\n\nالسعر: ${selectedProduct.price} د.ع\n\n(سأفتح لك السلة الآن)`);
+    openCart();
 }
 
-function closeModal() {
-    const modal = document.getElementById('productModal');
-    if(modal) modal.remove();
+function openCart() {
+    document.getElementById('cart-modal').style.display = 'block';
 }
 
-function sendToWhatsApp(productName) {
-    const phone = "9647XXXXXXXX"; // رقمك هنا
-    const msg = `مرحباً متجر ميار، أريد طلب: ${productName}`;
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`);
+function sendOrder() {
+    const name = document.getElementById('u_name').value;
+    const phone = document.getElementById('u_phone').value;
+    const address = document.getElementById('u_addr').value;
+
+    if(!name || !phone) return alert("يرجى ملء الاسم والرقم");
+
+    const whatsappNumber = "9647XXXXXXXX"; // حط رقمك هنا
+    const message = `طلب جديد من متجر ميار:\n\nالمنتج: ${selectedProduct.name}\nالسعر: ${selectedProduct.price}\n---\nالزبون: ${name}\nالرقم: ${phone}\nالعنوان: ${address}`;
+    
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`);
 }
 
 window.onload = displayProducts;
