@@ -1,65 +1,35 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر ميار | Mayar Store</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
-
-    <header>
-        <div class="container header-content">
-            <h1 class="logo">ميار<span class="dot">.</span></h1>
-            <nav>
-                <ul>
-                    <li><a href="#" class="active">الرئيسية</a></li>
-                    <li><a href="#products">المنتجات</a></li>
-                    <li><a href="#contact">اتصل بنا</a></li>
-                    <li class="cart-icon" onclick="toggleCart()">
-                        <a href="javascript:void(0)">
-                            <i class="fas fa-shopping-cart"></i> 
-                            <span id="cart-count">0</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </header>
-
-    <div id="side-cart" class="side-cart">
-        <div class="cart-header">
-            <h3>سلة المشتريات</h3>
-            <span class="close-cart" onclick="toggleCart()">×</span>
-        </div>
-        <div id="cart-items-container" class="cart-items-body">
-            <p class="empty-msg">السلة فارغة حالياً</p>
-        </div>
-        <div class="cart-footer">
-            <div class="total">المجموع: <span id="cart-total">0</span> د.ع</div>
-            <button class="btn-checkout" onclick="openOrderForm()">إتمام الطلب</button>
-        </div>
+<header>
+    <a href="#" class="logo">ميار<span style="color:white">.</span></a>
+    <div class="cart-trigger" onclick="toggleCart()">
+        <i class="fas fa-shopping-bag"></i>
+        <span id="cart-count">0</span>
     </div>
+</header>
 
-    <div id="order-modal" class="modal">
-        <div class="modal-content">
-            <h3>معلومات التوصيل</h3>
-            <input type="text" id="cust-name" placeholder="الاسم الكامل">
-            <input type="text" id="cust-phone" placeholder="رقم الهاتف">
-            <input type="text" id="cust-address" placeholder="المحافظة / العنوان">
-            <button class="btn-send" onclick="sendToWhatsApp()">إرسال الطلب عبر واتساب</button>
-            <button class="btn-close" onclick="closeOrderForm()">إلغاء</button>
-        </div>
+<section class="hero">
+    <h2>عالم ميار للفخامة</h2>
+    <p>أرقى الأحذية والحقائب بين يديك</p>
+</section>
+
+<section class="products-container">
+    <div class="product-grid" id="product-list"></div>
+</section>
+
+<div id="side-cart" class="side-cart">
+    <h2 style="color:var(--gold); margin-bottom:20px">سلتك</h2>
+    <div id="cart-items" style="flex-grow:1"></div>
+    <div style="border-top:1px solid #333; padding-top:20px">
+        <h3>المجموع: <span id="total-price">0</span></h3>
+        <button class="btn" style="margin-top:20px" onclick="openCheckout()">إتمام الطلب</button>
+        <button class="btn" style="background:none; color:white; margin-top:10px" onclick="toggleCart()">إغلاق</button>
     </div>
+</div>
 
-    <section class="hero hero-animate">
-        <div class="container hero-content">
-            <h2 class="welcome-text">أهلاً بك في عالم ميار</h2>
-            <p class="sub-text">تجربة تسوق عصرية وذكية، مصممة خصيصاً لك.</p>
-            <a href="#products" class="btn btn-primary">اكتشف الآن</a>
-        </div>
-    </section>
-
-    <section id="products" class="products
-        
+<div id="order-modal" class="modal">
+    <div class="modal-content">
+        <h2 style="color:var(--gold); margin-bottom:20px">معلومات التوصيل</h2>
+        <input type="text" id="name" placeholder="الاسم الكامل">
+        <input type="text" id="phone" placeholder="رقم الهاتف">
+        <button class="btn" onclick="finishOrder()">تأكيد عبر واتساب</button>
+    </div>
+</div>
