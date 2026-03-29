@@ -1,254 +1,87 @@
-/* الألوان والمتغيرات */
 :root {
-    --primary-color: #f7b3c2; /* الوردي الهادئ */
-    --accent-color: #f06c88;  /* وردي أغمق للتركيز */
-    --text-color: #333;
-    --background-color: #ffffff;
-    --card-background: #fdfdfe;
-    --header-color: #fff;
-}
-
-/* التنسيق العام */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+    --gold: #D4AF37; /* ذهبي ملوكي */
+    --dark-bg: #121212; /* أسود مطفي */
+    --card-bg: #1e1e1e;
+    --text-light: #ffffff;
+    --border-radius: 20px;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--background-color);
-    color: var(--text-color);
-    overflow-x: hidden;
+    background-color: var(--dark-bg);
+    color: var(--text-light);
+    font-family: 'Cairo', sans-serif;
+    margin: 0;
 }
 
-.container {
-    width: 85%;
-    max-width: 1200px;
-    margin: auto;
-}
-
-/* الهيدر والعلامة التجارية */
-header {
-    background: var(--header-color);
-    padding: 15px 0;
-    border-bottom: 1px solid #eee;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-}
-
-.header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
+/* شعار ميار بالذهبي */
 .logo {
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--primary-color);
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+    color: var(--gold) !important;
+    font-size: 30px;
+    font-weight: bold;
 }
 
-.logo .dot {
-    color: var(--accent-color);
-}
-
-header nav ul {
-    list-style: none;
-    display: flex;
-    gap: 30px;
-    align-items: center;
-}
-
-header nav ul li a {
-    color: var(--text-color);
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s;
-}
-
-header nav ul li a:hover,
-header nav ul li a.active {
-    color: var(--primary-color);
-}
-
-.cart-icon a i {
-    font-size: 1.2rem;
-    margin-left: 5px;
-}
-
-/* قسم الترحيب والأنيميشن */
-.hero {
-    height: 70vh;
-    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-}
-
-.hero-animate {
-    animation: slideDown 1s ease-out;
-}
-
-.hero-content {
-    max-width: 600px;
-}
-
-.welcome-text {
-    font-size: 3rem;
-    font-weight: 700;
-    margin-bottom: 15px;
-    color: #444;
-}
-
-.sub-text {
-    font-size: 1.2rem;
-    color: #777;
-    margin-bottom: 30px;
-}
-
-.btn-primary {
-    background-color: var(--primary-color);
-    padding: 12px 30px;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 25px;
-    font-weight: 600;
-    transition: background 0.3s;
-}
-
-.btn-primary:hover {
-    background-color: var(--accent-color);
-}
-
-/* المنتجات مع حواف ناعمة */
-.products-section {
-    padding: 70px 0;
-}
-
-.section-title {
-    text-align: center;
-    font-size: 2.2rem;
-    margin-bottom: 50px;
-    color: #444;
-}
-
-.product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
-}
-
+/* كارت المنتج بحواف بارزة */
 .product-card {
-    background: var(--card-background);
-    padding: 20px;
-    border-radius: 18px; /* الزوايا الناعمة جداً */
-    box-shadow: 0 10px 30px rgba(0,0,0,0.04);
-    text-align: center;
-    transition: transform 0.3s, box-shadow 0.3s;
-    opacity: 0; /* للأنيميشن */
-    transform: translateY(20px);
-}
-
-.product-card.show-card {
-    opacity: 1;
-    transform: translateY(0);
-    animation: fadeSlideUp 0.8s ease-out forwards;
+    background: var(--card-bg);
+    border: 1px solid #333;
+    border-radius: var(--border-radius);
+    padding: 15px;
+    transition: all 0.4s ease;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5); /* حواف بارزة */
 }
 
 .product-card:hover {
-    transform: translateY(-5px) !important;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    transform: translateY(-10px) scale(1.02);
+    border-color: var(--gold);
+    box-shadow: 0 15px 30px rgba(212, 175, 55, 0.2);
 }
 
 .product-card img {
-    max-width: 100%;
-    border-radius: 12px;
-    margin-bottom: 20px;
+    border-radius: 15px;
+    width: 100%;
+    transition: transform 0.3s;
 }
 
-.product-card h4 {
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-    color: #555;
+/* نافذة التفاصيل (Modal) */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9);
+    justify-content: center;
+    align-items: center;
 }
 
-.product-card .price {
-    color: var(--accent-color);
-    font-weight: 700;
-    font-size: 1.1rem;
-    margin-bottom: 15px;
-}
-
-/* قسم الفوتر */
-footer {
-    background-color: #333;
-    color: #fff;
-    padding: 60px 0 20px 0;
-    margin-top: 50px;
-}
-
-.footer-content {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 50px;
-    margin-bottom: 40px;
-}
-
-.footer-info h3 {
-    color: var(--primary-color);
-    margin-bottom: 15px;
-}
-
-.footer-contact p, .footer-info p {
-    color: #ccc;
-    font-size: 0.95rem;
-    line-height: 1.6;
-}
-
-.footer-social .social-icons {
-    display: flex;
-    gap: 15px;
-    margin-top: 15px;
-}
-
-.social-icons a i {
-    color: #fff;
-    font-size: 1.3rem;
-    transition: color 0.3s;
-}
-
-.social-icons a:hover i {
-    color: var(--primary-color);
-}
-
-.footer-bottom {
+.modal-content {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: var(--border-radius);
+    max-width: 500px;
+    width: 90%;
     text-align: center;
-    border-top: 1px solid #555;
-    padding-top: 20px;
-    font-size: 0.85rem;
-    color: #aaa;
+    border: 2px solid var(--gold);
 }
 
-/* تعريفات الأنيميشن */
-@keyframes slideDown {
-    from { transform: translateY(-30px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+.modal img { width: 100%; border-radius: 15px; margin-bottom: 20px; }
+
+.price-tag {
+    color: var(--gold);
+    font-size: 24px;
+    font-weight: bold;
+    margin: 15px 0;
 }
 
-@keyframes fadeSlideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* توافق الشاشات الصغيرة */
-@media (max-width: 768px) {
-    .header-content { flex-direction: column; gap: 15px; }
-    .hero-content { width: 90%; }
-    .welcome-text { font-size: 2rem; }
-    .footer-content { grid-template-columns: 1fr; gap: 30px; }
+/* زر الإضافة */
+.btn-order {
+    background: var(--gold);
+    color: #000;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
 }
