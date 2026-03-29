@@ -1,35 +1,333 @@
-<header>
-    <a href="#" class="logo">ميار<span style="color:white">.</span></a>
-    <div class="cart-trigger" onclick="toggleCart()">
-        <i class="fas fa-shopping-bag"></i>
-        <span id="cart-count">0</span>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر ميار | Mayar Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --gold: #D4AF37; /* ذهبي فخم */
+            --dark-bg: #0d0d0d; /* أسود مو كلش غامق */
+            --card-bg: #1a1a1a;
+            --text: #ffffff;
+            --radius: 25px; /* حواف غير حادة */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; outline: none; }
+        
+        body { background-color: var(--dark-bg); color: var(--text); overflow-x: hidden; }
+
+        /* الهيدر */
+        header {
+            position: fixed; top: 0; width: 100%; background: rgba(13, 13, 13, 0.9);
+            backdrop-filter: blur(10px); display: flex; justify-content: space-between;
+            align-items: center; padding: 15px 5%; z-index: 1000; border-bottom: 1px solid #222;
+        }
+        .logo { color: var(--gold); font-size: 28px; font-weight: 900; text-decoration: none; }
+        .cart-icon { color: var(--gold); font-size: 24px; cursor: pointer; position: relative; }
+        .cart-count {
+            position: absolute; top: -8px; right: -8px; background: red; color: white;
+            font-size: 12px; font-weight: bold; width: 20px; height: 20px;
+            display: flex; justify-content: center; align-items: center; border-radius: 50%;
+        }
+
+        /* رسالة الترحيب - تنزل من فوك */
+        .hero {
+            height: 100vh; display: flex; flex-direction: column; justify-content: center;
+            align-items: center; text-align: center; padding: 20px;
+            animation: slideDown 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            opacity: 0; transform: translateY(-50px);
+        }
+        @keyframes slideDown { to { opacity: 1; transform: translateY(0); } }
+        .hero h1 { color: var(--gold); font-size: 3.5rem; margin-bottom: 15px; }
+        .hero p { font-size: 1.2rem; color: #ccc; }
+
+        /* قسم المنتجات - يمنه ويسره */
+        .products { padding: 50px 5%; overflow: hidden; }
+        .section-title { color: var(--gold); text-align: center; font-size: 2.5rem; margin-bottom: 40px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+
+        .card {
+            background: var(--card-bg); border-radius: var(--radius); padding: 20px;
+            cursor: pointer; border: 1px solid #333; transition: 0.4s;
+            opacity: 0; /* مخفي بالبداية للانميشن */
+        }
+        .card:hover { transform: translateY(-10px); border-color: var(--gold); box-shadow: 0 10px 20px rgba(212, 175, 55, 0.1); }
+        .card img { width: 100%; border-radius: 15px; margin-bottom: 15px; height: 250px; object-fit: cover; }
+        .card h3 { color: var(--gold); font-size: 1.5rem; margin-bottom: 10px; }
+        .card p { font-size: 1.2rem; font-weight: bold; }
+
+        /* حركات السكرول يمنه ويسره */
+        .slide-right { transform: translateX(100px); }
+        .slide-left { transform: translateX(-100px); }
+        .show-element { opacity: 1; transform: translateX(0); transition: all 1s ease-out; }
+
+        /* صفحة المنتج (شاشة كاملة) */
+        .full-product {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--dark-bg); z-index: 2000; display: none; overflow-y: auto;
+            flex-direction: column; padding-bottom: 100px;
+        }
+        .close-fp { position: absolute; top: 20px; right: 20px; font-size: 30px; color: var(--gold); cursor: pointer; z-index: 2010; background: rgba(0,0,0,0.5); width: 40px; height: 40px; border-radius: 50%; text-align: center; line-height: 40px;}
+        .fp-img { width: 100%; height: 55vh; object-fit: cover; border-bottom-left-radius: 40px; border-bottom-right-radius: 40px; }
+        .fp-details { padding: 30px; text-align: right; }
+        .fp-details h2 { color: var(--gold); font-size: 2.5rem; margin-bottom: 15px; }
+        .fp-details .fp-price { font-size: 2rem; font-weight: bold; margin-bottom: 20px; }
+        .fp-details p { font-size: 1.2rem; line-height: 1.8; color: #ddd; }
+        
+        .btn-add-cart {
+            position: fixed; bottom: 20px; left: 5%; width: 90%;
+            background: var(--gold); color: #000; border: none; padding: 18px;
+            font-size: 1.3rem; font-weight: bold; border-radius: 50px; /* مستطيل بحواف غير حادة ابد */
+            cursor: pointer; box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        /* السلة */
+        .cart-sidebar {
+            position: fixed; top: 0; right: -100%; width: 350px; max-width: 100%; height: 100%;
+            background: var(--card-bg); z-index: 3000; padding: 20px; transition: 0.4s;
+            border-left: 2px solid var(--gold); display: flex; flex-direction: column;
+        }
+        .cart-sidebar.open { right: 0; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 15px;}
+        .cart-header h2 { color: var(--gold); }
+        .close-cart { font-size: 25px; cursor: pointer; color: white; }
+        .cart-items { flex-grow: 1; overflow-y: auto; }
+        .cart-item { display: flex; justify-content: space-between; background: #222; padding: 15px; border-radius: 15px; margin-bottom: 10px; }
+        .cart-total { font-size: 1.5rem; font-weight: bold; margin: 20px 0; color: var(--gold); text-align: center;}
+        
+        .btn-checkout { background: var(--gold); color: #000; width: 100%; padding: 15px; border-radius: 20px; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer; }
+
+        /* فورم التوصيل */
+        .checkout-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 4000; display: none;
+            justify-content: center; align-items: center; padding: 20px;
+        }
+        .form-box { background: var(--card-bg); padding: 30px; border-radius: var(--radius); width: 100%; max-width: 400px; border: 1px solid var(--gold); }
+        .form-box h2 { color: var(--gold); text-align: center; margin-bottom: 20px; }
+        .form-box input { width: 100%; background: #111; border: 1px solid #444; color: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; font-size: 1.1rem; }
+        .form-box input:focus { border-color: var(--gold); }
+        .btn-cancel { background: transparent; color: white; width: 100%; padding: 15px; border: none; cursor: pointer; margin-top: 10px; }
+
+        /* الفوتر */
+        footer { background: #0a0a0a; padding: 40px 5%; text-align: center; border-top: 1px solid #222; margin-top: 50px; }
+        footer h2 { color: var(--gold); font-size: 2rem; margin-bottom: 15px; }
+        footer p { font-size: 1.1rem; color: #aaa; margin-bottom: 10px; }
+        .socials { margin-top: 20px; }
+        .socials i { color: var(--gold); font-size: 24px; margin: 0 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="#" class="logo">ميار<span style="color:white">.</span></a>
+        <div class="cart-icon" onclick="toggleCart()">
+            <i class="fas fa-shopping-bag"></i>
+            <span class="cart-count" id="cart-count-badge">0</span>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1>أهلاً بك في عالم ميار</h1>
+        <p>أرقى التشكيلات من الأحذية والحقائب الفاخرة بين يديك.</p>
+    </section>
+
+    <section class="products">
+        <h2 class="section-title">تشكيلة النخبة</h2>
+        <div class="grid" id="products-grid">
+            </div>
+    </section>
+
+    <div class="full-product" id="full-product-view">
+        <i class="fas fa-arrow-right close-fp" onclick="closeProductView()"></i>
+        <img src="" alt="" class="fp-img" id="fp-image">
+        <div class="fp-details">
+            <h2 id="fp-title"></h2>
+            <div class="fp-price" id="fp-price"></div>
+            <p id="fp-desc"></p>
+        </div>
+        <button class="btn-add-cart" onclick="addCurrentToCart()">إضافة للسلة</button>
     </div>
-</header>
 
-<section class="hero">
-    <h2>عالم ميار للفخامة</h2>
-    <p>أرقى الأحذية والحقائب بين يديك</p>
-</section>
-
-<section class="products-container">
-    <div class="product-grid" id="product-list"></div>
-</section>
-
-<div id="side-cart" class="side-cart">
-    <h2 style="color:var(--gold); margin-bottom:20px">سلتك</h2>
-    <div id="cart-items" style="flex-grow:1"></div>
-    <div style="border-top:1px solid #333; padding-top:20px">
-        <h3>المجموع: <span id="total-price">0</span></h3>
-        <button class="btn" style="margin-top:20px" onclick="openCheckout()">إتمام الطلب</button>
-        <button class="btn" style="background:none; color:white; margin-top:10px" onclick="toggleCart()">إغلاق</button>
+    <div class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+            <h2>سلتك</h2>
+            <i class="fas fa-times close-cart" onclick="toggleCart()"></i>
+        </div>
+        <div class="cart-items" id="cart-items-list"></div>
+        <div class="cart-total">المجموع: <span id="cart-total-price">0</span> د.ع</div>
+        <button class="btn-checkout" onclick="openCheckout()">إتمام الطلب</button>
     </div>
-</div>
 
-<div id="order-modal" class="modal">
-    <div class="modal-content">
-        <h2 style="color:var(--gold); margin-bottom:20px">معلومات التوصيل</h2>
-        <input type="text" id="name" placeholder="الاسم الكامل">
-        <input type="text" id="phone" placeholder="رقم الهاتف">
-        <button class="btn" onclick="finishOrder()">تأكيد عبر واتساب</button>
+    <div class="checkout-modal" id="checkout-modal">
+        <div class="form-box">
+            <h2>معلومات التوصيل</h2>
+            <input type="text" id="c_name" placeholder="الاسم الكامل">
+            <input type="tel" id="c_phone" placeholder="رقم الهاتف">
+            <input type="text" id="c_address" placeholder="المحافظة / العنوان الدقيق">
+            <button class="btn-checkout" onclick="sendOrder()">تأكيد عبر واتساب</button>
+            <button class="btn-cancel" onclick="closeCheckout()">إلغاء الرجوع للسلة</button>
+        </div>
     </div>
-</div>
+
+    <footer>
+        <h2>متجر ميار</h2>
+        <p>الفخامة لها عنوان، والجودة هي طريقنا.</p>
+        <p><i class="fas fa-phone" style="color:var(--gold); margin-left:10px;"></i> +964 7XX XXX XXXX</p>
+        <p><i class="fas fa-map-marker-alt" style="color:var(--gold); margin-left:10px;"></i> العراق - بغداد</p>
+        <div class="socials">
+            <i class="fab fa-instagram"></i>
+            <i class="fab fa-facebook"></i>
+            <i class="fab fa-whatsapp"></i>
+        </div>
+    </footer>
+
+    <script>
+        // بيانات المنتجات
+        const products = [
+            { id: 1, name: "حذاء ميار الملكي", price: 45000, desc: "حذاء مصنوع من أفخم أنواع الجلد الطبيعي، تصميم مريح وأنيق يناسب كافة المناسبات الرسمية. حواف ناعمة ولون ثابت.", img: "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=600&q=80" },
+            { id: 2, name: "حقيبة يد كلاسيك", price: 65000, desc: "حقيبة يد بتفاصيل ذهبية جذابة، مساحة داخلية واسعة تلبي جميع احتياجاتك اليومية بتصميم يبرز فخامتك.", img: "https://images.unsplash.com/photo-1584916201218-f4242ceb4809?auto=format&fit=crop&w=600&q=80" },
+            { id: 3, name: "حذاء سبورت فخم", price: 50000, desc: "يجمع بين الراحة الرياضية والشكل العصري الفخم، مناسب للاستخدام اليومي والمشي الطويل.", img: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=600&q=80" },
+            { id: 4, name: "حقيبة سهرة ذهبية", price: 75000, desc: "مصممة خصيصاً للمناسبات الخاصة، قفل معدني باللون الذهبي المطفي يضيف لمسة من السحر.", img: "https://images.unsplash.com/photo-1591561954557-26941169b49e?auto=format&fit=crop&w=600&q=80" }
+        ];
+
+        let cart = [];
+        let currentSelectedProduct = null;
+
+        // عرض المنتجات وتجهيز الحركات
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = products.map((p, index) => {
+                const direction = index % 2 === 0 ? 'slide-right' : 'slide-left';
+                return `
+                <div class="card ${direction}" onclick="openProduct(${p.id})">
+                    <img src="${p.img}" alt="${p.name}">
+                    <h3>${p.name}</h3>
+                    <p style="color:var(--gold)">${p.price.toLocaleString()} د.ع</p>
+                </div>
+            `}).join('');
+            setupScrollAnimation();
+        }
+
+        // حركة ظهور المنتجات عند النزول (الانميشن)
+        function setupScrollAnimation() {
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('show-element');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.card').forEach(card => observer.observe(card));
+        }
+
+        // فتح صفحة المنتج (شاشة كاملة)
+        function openProduct(id) {
+            currentSelectedProduct = products.find(p => p.id === id);
+            document.getElementById('fp-image').src = currentSelectedProduct.img;
+            document.getElementById('fp-title').innerText = currentSelectedProduct.name;
+            document.getElementById('fp-price').innerText = currentSelectedProduct.price.toLocaleString() + " د.ع";
+            document.getElementById('fp-desc').innerText = currentSelectedProduct.desc;
+            
+            document.getElementById('full-product-view').style.display = 'flex';
+        }
+
+        // إغلاق صفحة المنتج
+        function closeProductView() {
+            document.getElementById('full-product-view').style.display = 'none';
+        }
+
+        // إضافة للسلة
+        function addCurrentToCart() {
+            cart.push(currentSelectedProduct);
+            updateCartUI();
+            closeProductView();
+            // ومضة خفيفة للسلة ليعرف أنه انضاف
+            const badge = document.getElementById('cart-count-badge');
+            badge.style.transform = "scale(1.5)";
+            setTimeout(() => badge.style.transform = "scale(1)", 300);
+        }
+
+        // تحديث شكل السلة
+        function updateCartUI() {
+            document.getElementById('cart-count-badge').innerText = cart.length;
+            const list = document.getElementById('cart-items-list');
+            
+            if(cart.length === 0) {
+                list.innerHTML = "<p style='text-align:center; color:#888; margin-top:50px;'>السلة فارغة</p>";
+                document.getElementById('cart-total-price').innerText = "0";
+                return;
+            }
+
+            list.innerHTML = cart.map((item, index) => `
+                <div class="cart-item">
+                    <div>
+                        <div style="color:white; font-weight:bold">${item.name}</div>
+                        <div style="color:var(--gold); font-size:0.9rem">${item.price.toLocaleString()} د.ع</div>
+                    </div>
+                    <i class="fas fa-trash" style="color:#ff4444; cursor:pointer; line-height:40px" onclick="removeFromCart(${index})"></i>
+                </div>
+            `).join('');
+
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            document.getElementById('cart-total-price').innerText = total.toLocaleString();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        // فتح واغلاق السلة
+        function toggleCart() {
+            document.getElementById('cart-sidebar').classList.toggle('open');
+        }
+
+        // مودل التوصيل
+        function openCheckout() {
+            if(cart.length === 0) return alert("سلتك فارغة يا بطل!");
+            document.getElementById('cart-sidebar').classList.remove('open');
+            document.getElementById('checkout-modal').style.display = 'flex';
+        }
+
+        function closeCheckout() {
+            document.getElementById('checkout-modal').style.display = 'none';
+            document.getElementById('cart-sidebar').classList.add('open');
+        }
+
+        // ارسال الطلب للواتساب
+        function sendOrder() {
+            const name = document.getElementById('c_name').value;
+            const phone = document.getElementById('c_phone').value;
+            const address = document.getElementById('c_address').value;
+
+            if(!name || !phone || !address) return alert("رجاءً املأ كل المعلومات!");
+
+            const itemsText = cart.map(i => `- ${i.name}`).join('\n');
+            const total = document.getElementById('cart-total-price').innerText;
+            
+            const message = `*طلب جديد من متجر ميار* 👑\n\n*الزبون:* ${name}\n*الرقم:* ${phone}\n*العنوان:* ${address}\n\n*المنتجات:*\n${itemsText}\n\n*المجموع الكلي:* ${total} د.ع`;
+            
+            // رقم الواتساب الخاص بيك (بدون أصفار بالبداية وبدون +)
+            const whatsappNumber = "9647XXXXXXXX"; 
+            
+            window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`);
+            
+            // تصفير السلة بعد الطلب
+            cart = [];
+            updateCartUI();
+            document.getElementById('checkout-modal').style.display = 'none';
+        }
+
+        // تشغيل البداية
+        window.onload = () => {
+            renderProducts();
+            updateCartUI();
+        };
+    </script>
+</body>
+</html>
