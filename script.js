@@ -1,44 +1,77 @@
 const products = [
-    { id: 1, name: "حذاء كلاسيك ذهبي", price: "45,000", desc: "جلد طبيعي فاخر بنقشة ملوكية.", img: "URL_IMAGE_HERE" },
-    { id: 2, name: "حقيبة يد ملكية", price: "65,000", desc: "حقيبة سهرة مع قفل ذهبي مميز.", img: "URL_IMAGE_HERE" }
+    { id: 1, name: "حذاء لويس فيتون - ملكي", price: 45000, img: "https://via.placeholder.com/300x300/121212/c5a059?text=Shoes+1" },
+    { id: 2, name: "حقيبة يد كلاسيك", price: 65000, img: "https://via.placeholder.com/300x300/121212/c5a059?text=Bag+1" },
+    { id: 3, name: "حذاء رياضي ذهبي", price: 50000, img: "https://via.placeholder.com/300x300/121212/c5a059?text=Shoes+2" }
 ];
 
-let selectedProduct = null;
+let cart = [];
 
-function displayProducts() {
+function init() {
     const grid = document.getElementById('product-list');
-    grid.innerHTML = products.map(p => `
-        <div class="product-card">
-            <div>
-                <h3 style="color:var(--gold)">${p.name}</h3>
-                <p class="price-tag">${p.price} د.ع</p>
-            </div>
-            <button class="btn-detail" onclick="showDetails(${p.id})">التفاصيل</button>
+    grid.innerHTML = products.map((p, index) => `
+        <div class="product-card ${index % 2 === 0 ? 'left-slide' : 'right-slide'}" id="p-${p.id}">
+            <img src="${p.img}">
+            <h3>${p.name}</h3>
+            <p class="price">${p.price.toLocaleString()} د.ع</p>
+            <button class="btn" onclick="addToCart(${p.id})">أضف للسلة</button>
         </div>
     `).join('');
-}
-
-function showDetails(id) {
-    selectedProduct = products.find(p => p.id === id);
-    alert(`تفاصيل المنتج: ${selectedProduct.name}\n\n${selectedProduct.desc}\n\nالسعر: ${selectedProduct.price} د.ع\n\n(سأفتح لك السلة الآن)`);
-    openCart();
-}
-
-function openCart() {
-    document.getElementById('cart-modal').style.display = 'block';
-}
-
-function sendOrder() {
-    const name = document.getElementById('u_name').value;
-    const phone = document.getElementById('u_phone').value;
-    const address = document.getElementById('u_addr').value;
-
-    if(!name || !phone) return alert("يرجى ملء الاسم والرقم");
-
-    const whatsappNumber = "9647XXXXXXXX"; // حط رقمك هنا
-    const message = `طلب جديد من متجر ميار:\n\nالمنتج: ${selectedProduct.name}\nالسعر: ${selectedProduct.price}\n---\nالزبون: ${name}\nالرقم: ${phone}\nالعنوان: ${address}`;
     
-    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`);
+    // تفعيل حركة الظهور عند السكرول
+    window.addEventListener('scroll', reveal);
+    reveal();
 }
 
-window.onload = displayProducts;
+function reveal() {
+    const cards = document.querySelectorAll('.product-card');
+    cards.forEach(card => {
+        const windowHeight = window.innerHeight;
+        const cardTop = card.getBoundingClientRect().top;
+        if (cardTop < windowHeight - 100) card.classList.add('reveal');
+    });
+}
+
+function addToCart(id) {
+    const p = products.find(item => item.id === id);
+    cart.push(p);
+    updateCart();
+    document.getElementById('side-cart').classList.add('open');
+}
+
+function updateCart() {
+    document.getElementById('cart-count').innerText = cart.length;
+    const container = document.getElementById('cart-items');
+    container.innerHTML = cart.map(item => `
+        <div class="cart-item">
+            <span>${item.name}</span>
+            <span style="color:var(--gold)">${item.price.toLocaleString()}</span>
+        </div>
+    `).join('');
+    
+    const total = cart.reduce((sum, item) => sum + item.price, 0);
+    document.getElementById('total-price').innerText = total.toLocaleString() + " د.ع";
+}
+
+function toggleCart() {
+    document.getElementById('side-cart').classList.toggle('open');
+}
+
+function openCheckout() {
+    if(cart.length === 0) return alert("السلة فارغة!");
+    document.getElementById('order-modal').style.display = 'flex';
+}
+
+function finishOrder() {
+    const name = document.getElementById('name').value;
+    const phone = document.getElementById('phone').value;
+    if(!name || !phone) return alert("كمل المعلومات يا بطل");
+
+    const itemsStr = cart.map(i => i.name).join(', ');
+    const total = document.getElementById('total-price').innerText;
+    const msg = `طلب جديد:\nالاسم: ${name}\nالرقم: ${phone}\nالمنتجات: ${itemsStr}\nالمجموع: ${total}`;
+    
+    window.open(`https://wa.me/9647XXXXXXXX?text=${encodeURIComponent(msg)}`);
+}
+
+window.onload = init;
+
