@@ -1,60 +1,48 @@
-// بيانات المنتجات (Static Data) - يمكنك تعديلها هنا
-const productsData = [
-    { id: 1, name: "لوحة مفاتيح ميكانيكية", price: "45$", img: "https://via.placeholder.com/300" },
-    { id: 2, name: "ماوس ألعاب لاسلكي", price: "30$", img: "https://via.placeholder.com/300" },
-    { id: 3, name: "سماعات محيطية", price: "60$", img: "https://via.placeholder.com/300" },
-    { id: 4, name: "شاحن لاسلكي سريع", price: "25$", img: "https://via.placeholder.com/300" },
-    { id: 5, name: "حقيبة لابتوب عصرية", price: "55$", img: "https://via.placeholder.com/300" }
+const products = [
+    { id: 1, name: "حذاء كلاسيك ذهبي", price: "45,000", desc: "جلد طبيعي فاخر مناسب للمناسبات الرسمية", img: "shoes1.jpg" },
+    { id: 2, name: "حقيبة يد ملكية", price: "65,000", desc: "تصميم عصري مع مساحة داخلية واسعة", img: "bag1.jpg" },
 ];
 
-// جلب العناصر
-const productList = document.getElementById('product-list');
-const cartCount = document.getElementById('cart-count');
-let currentCartItems = 0;
+const productGrid = document.getElementById('product-list');
 
-// عرض المنتجات في الـ Grid
-function loadProducts() {
-    productsData.forEach((product, index) => {
-        // إنشاء عنصر الـ Card
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.innerHTML = `
-            <img src="${product.img}" alt="${product.name}">
-            <h4>${product.name}</h4>
-            <p class="price">${product.price}</p>
-            <button onclick="addToCart(${product.id})" class="btn-primary">إضافة للسلة</button>
-        `;
-        
-        // إضافة الكارت للـ Grid
-        productList.appendChild(card);
-        
-        // تطبيق أنيميشن الظهور المتتالي (Sequential Animation)
-        setTimeout(() => {
-            card.classList.add('show-card');
-        }, index * 100); // كل كارت يظهر بعد 100ms من اللي قبله
-    });
+function displayProducts() {
+    productGrid.innerHTML = products.map(p => `
+        <div class="product-card" onclick="openProduct(${p.id})">
+            <img src="${p.img}" alt="${p.name}">
+            <h3>${p.name}</h3>
+            <p class="price-tag">${p.price} د.ع</p>
+            <p>اضغط للتفاصيل</p>
+        </div>
+    `).join('');
 }
 
-// وظيفة إضافة منتج للسلة
-function addToCart(productId) {
-    currentCartItems++;
-    cartCount.innerText = currentCartItems;
-    
-    // أنيميشن صغير على أيقونة السلة
-    cartCount.style.animation = 'scaleUp 0.3s ease-in-out';
-    setTimeout(() => { cartCount.style.animation = ''; }, 300);
+// نافذة تفاصيل المنتج
+function openProduct(id) {
+    const p = products.find(item => item.id === id);
+    const modalHtml = `
+        <div id="productModal" class="modal" style="display:flex">
+            <div class="modal-content">
+                <span onclick="closeModal()" style="cursor:pointer; float:left">✖</span>
+                <img src="${p.img}">
+                <h2>${p.name}</h2>
+                <p>${p.desc}</p>
+                <p class="price-tag">${p.price} د.ع</p>
+                <button class="btn-order" onclick="sendToWhatsApp('${p.name}')">طلب عبر واتساب</button>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
 
-// تشغيل الوظيفة عند تحميل الصفحة
-window.addEventListener('DOMContentLoaded', loadProducts);
-
-// أنيميشن صغير لأيقونة السلة في الـ CSS (إضافة برمجية)
-const style = document.createElement('style');
-style.innerHTML = `
-@keyframes scaleUp {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.3); }
-    100% { transform: scale(1); }
+function closeModal() {
+    const modal = document.getElementById('productModal');
+    if(modal) modal.remove();
 }
-`;
-document.head.appendChild(style);
+
+function sendToWhatsApp(productName) {
+    const phone = "9647XXXXXXXX"; // رقمك هنا
+    const msg = `مرحباً متجر ميار، أريد طلب: ${productName}`;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`);
+}
+
+window.onload = displayProducts;
